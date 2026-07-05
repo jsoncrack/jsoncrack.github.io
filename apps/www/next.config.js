@@ -7,6 +7,9 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
  */
 const config = {
   output: "export",
+  images: {
+    unoptimized: true,
+  },
   reactStrictMode: false,
   productionBrowserSourceMaps: true,
   compiler: {
