@@ -111,17 +111,7 @@ export const Navbar = () => {
           </Button>
         </Center>
         <Right>
-          <Button
-            component="a"
-            href="https://todiagram.com?utm_source=jsoncrack&utm_medium=navbar"
-            variant="subtle"
-            color="black"
-            size="md"
-            radius="md"
-            rel="noopener"
-          >
-            Upgrade
-          </Button>
+
           <Button
             radius="md"
             component="a"
