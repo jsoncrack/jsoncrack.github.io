@@ -292,7 +292,6 @@ export const JSONCrack = forwardRef<JSONCrackRef, JSONCrackProps>(
     }, [collapsedSet]);
 
     const { visibleNodes, visibleEdges } = useMemo(() => {
-      if (collapsedPrefixes.length === 0) return { visibleNodes: nodes, visibleEdges: edges };
       const hiddenIds = new Set<string>();
       const keptNodes: typeof nodes = [];
       for (const node of nodes) {
@@ -393,8 +392,11 @@ export const JSONCrack = forwardRef<JSONCrackRef, JSONCrackProps>(
         },
         expandAll: () => {
           if (isControlled) return;
-          setInternalCollapsedPaths([]);
-          onCollapseChangeRef.current?.([]);
+          const result = parseJsonGraph(jsonText, Number.MAX_SAFE_INTEGER);
+          if (result.kind === "ok") {
+            setInternalCollapsedPaths(result.defaultCollapsedPaths);
+            onCollapseChangeRef.current?.(result.defaultCollapsedPaths);
+          }
         },
         getCollapsedPaths: () => collapsedPathsRef.current ?? [],
       }),

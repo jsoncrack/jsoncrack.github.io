@@ -14,24 +14,38 @@ export const useCollapseContext = (): CollapseContextValue => useContext(Collaps
 
 export const pathKey = (path: JSONPath): string => JSON.stringify(path);
 
-export const isPathCollapsed = (collapsedSet: Set<string>, path: JSONPath): boolean =>
-  collapsedSet.has(pathKey(path));
+export const isPathCollapsed = (collapsedSet: Set<string>, path: JSONPath): boolean => {
+  const isDeep = path.length >= 2;
+  const isToggled = collapsedSet.has(pathKey(path));
+  return isDeep ? !isToggled : isToggled;
+};
 
 export const isNodeHidden = (
   collapsedPrefixes: readonly JSONPath[],
   nodePath: JSONPath | undefined
 ): boolean => {
-  if (!nodePath || collapsedPrefixes.length === 0) return false;
-  for (const prefix of collapsedPrefixes) {
-    if (prefix.length > nodePath.length) continue;
-    let matches = true;
-    for (let i = 0; i < prefix.length; i += 1) {
-      if (prefix[i] !== nodePath[i]) {
-        matches = false;
-        break;
+  if (!nodePath) return false;
+  
+  for (let len = 1; len < nodePath.length; len++) {
+    const isDeep = len >= 2;
+    let isToggled = false;
+    for (const prefix of collapsedPrefixes) {
+      if (prefix.length === len) {
+        let matches = true;
+        for (let i = 0; i < len; i += 1) {
+          if (prefix[i] !== nodePath[i]) {
+            matches = false;
+            break;
+          }
+        }
+        if (matches) {
+          isToggled = true;
+          break;
+        }
       }
     }
-    if (matches) return true;
+    const isCollapsed = isDeep ? !isToggled : isToggled;
+    if (isCollapsed) return true;
   }
   return false;
 };

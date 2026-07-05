@@ -4,6 +4,7 @@ import { calculateNodeSize } from "./utils/calculateNodeSize";
 
 export interface ParseGraphResult extends GraphData {
   errors: ParseError[];
+  defaultCollapsedPaths: string[];
 }
 
 export const parseGraph = (json: string): ParseGraphResult => {
@@ -15,11 +16,13 @@ export const parseGraph = (json: string): ParseGraphResult => {
       nodes: [],
       edges: [],
       errors: parseErrors,
+      defaultCollapsedPaths: [],
     };
   }
 
   const nodes: NodeData[] = [];
   const edges: EdgeData[] = [];
+  const defaultCollapsedPaths: string[] = [];
   let nodeId = 1;
   let edgeId = 1;
 
@@ -135,6 +138,11 @@ export const parseGraph = (json: string): ParseGraphResult => {
       });
     }
 
+    const currentPath = getNodePath(node);
+    if (currentPath && currentPath.length >= 1 && (node.type === "object" || node.type === "array")) {
+      defaultCollapsedPaths.push(JSON.stringify(currentPath));
+    }
+
     const appendParentKey = () => {
       const getParentKey = (targetNode: Node) => {
         const path = getNodePath(targetNode);
@@ -216,5 +224,6 @@ export const parseGraph = (json: string): ParseGraphResult => {
     nodes,
     edges,
     errors: parseErrors,
+    defaultCollapsedPaths,
   };
 };

@@ -66,7 +66,7 @@ export const buildCanvasStyle = (
 
 /** Discriminated result of parsing JSON text into a graph. */
 export type ParseJsonGraphResult =
-  | { kind: "ok"; graph: GraphData; syntaxErrorCount: number }
+  | { kind: "ok"; graph: GraphData; syntaxErrorCount: number; defaultCollapsedPaths: string[] }
   | { kind: "above-limit"; total: number }
   | { kind: "error"; error: Error };
 
@@ -80,7 +80,7 @@ export const parseJsonGraph = (
     if (graph.nodes.length > maxRenderableNodes) {
       return { kind: "above-limit", total: graph.nodes.length };
     }
-    return { kind: "ok", graph, syntaxErrorCount: graph.errors.length };
+    return { kind: "ok", graph, syntaxErrorCount: graph.errors.length, defaultCollapsedPaths: graph.defaultCollapsedPaths };
   } catch (error) {
     return {
       kind: "error",

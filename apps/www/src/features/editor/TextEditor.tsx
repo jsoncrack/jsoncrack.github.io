@@ -76,6 +76,16 @@ const TextEditor = () => {
     });
   }, []);
 
+  if (contents.length > 2000000) {
+    return (
+      <StyledEditorWrapper>
+        <StyledWrapper style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "#888", fontSize: "14px" }}>
+          File too large for text editor. Graph view only.
+        </StyledWrapper>
+      </StyledEditorWrapper>
+    );
+  }
+
   return (
     <StyledEditorWrapper>
       <StyledWrapper>
