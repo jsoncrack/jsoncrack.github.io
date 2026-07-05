@@ -59,33 +59,19 @@ The wrapper must have an explicit height.
 | `showGrid` | `boolean` | `true` | Show grid background |
 | `trackpadZoom` | `boolean` | `false` | Enables two-finger trackpad gesture zoom behavior |
 | `centerOnLayout` | `boolean` | `true` | Auto-center on first/major layout changes |
-| `maxRenderableNodes` | `number` | `1500` | Node rendering safety limit |
 | `className` | `string` | - | Wrapper class |
 | `style` | `React.CSSProperties` | - | Wrapper inline style |
 | `onNodeClick` | `(node: NodeData) => void` | - | Node click callback |
 | `onParse` | `(graph: GraphData) => void` | - | Parsed graph callback |
 | `onParseError` | `(error: Error) => void` | - | Parse error callback |
 | `onViewportCreate` | `(viewPort: ViewPort) => void` | - | Viewport ready callback |
-| `renderNodeLimitExceeded` | `(nodeCount: number, maxRenderableNodes: number) => React.ReactNode` | - | Custom fallback when node limit is exceeded |
 
 ## Performance
 
 The component renders all nodes as SVG elements. For large inputs, rendering cost grows with the number of nodes.
 
-- **Default limit:** `maxRenderableNodes` is set to `1500`. Graphs exceeding this render a fallback instead of the canvas.
 - **Recommended range:** Up to ~300–500 nodes for smooth interaction. Beyond that, panning and zooming may feel sluggish depending on the device.
 - **Reduce node count:** Flatten or trim your data before passing it in. Arrays of primitives become individual nodes, so large arrays expand the graph quickly.
-- **Custom fallback:** Use `renderNodeLimitExceeded` to show a message or alternative UI when the limit is hit.
-
-```tsx
-<JSONCrack
-  json={data}
-  maxRenderableNodes={300}
-  renderNodeLimitExceeded={(count, max) => (
-    <p>Too large to render ({count} nodes, limit is {max})</p>
-  )}
-/>
-```
 
 ## Imperative API (ref)
 

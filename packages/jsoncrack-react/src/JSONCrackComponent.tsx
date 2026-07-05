@@ -80,10 +80,6 @@ export interface JSONCrackProps {
   showGrid?: boolean;
   /** Treat two-finger trackpad gestures as touch (pinch-zoom, etc). Defaults to `false`. */
   trackpadZoom?: boolean;
-  /** Auto fit-to-center after each ELK layout pass. Defaults to `true`. */
-  centerOnLayout?: boolean;
-  /** Hard cap on renderable nodes; exceeding it triggers the limit overlay. Defaults to `1500`. */
-  maxRenderableNodes?: number;
   /** Additional class name appended to the canvas wrapper. */
   className?: string;
   /** Additional inline style merged onto the canvas wrapper. */
@@ -96,8 +92,6 @@ export interface JSONCrackProps {
   onParseError?: (error: Error) => void;
   /** Called once the internal `ViewPort` is created, before the first render. */
   onViewportCreate?: (viewPort: ViewPort) => void;
-  /** Custom renderer shown when the graph exceeds `maxRenderableNodes`. */
-  renderNodeLimitExceeded?: (nodeCount: number, maxRenderableNodes: number) => ReactNode;
   /**
    * Controlled collapsed-paths set (serialized via `pathKey` / `JSON.stringify`).
    * When provided, the component becomes controlled for collapse state and
@@ -123,15 +117,8 @@ export const JSONCrack = forwardRef<JSONCrackRef, JSONCrackProps>(
       showControls = true,
       showGrid = true,
       trackpadZoom = false,
-      centerOnLayout = true,
-      maxRenderableNodes = 1500,
-      className,
-      style,
-      onNodeClick,
-      onParse,
       onParseError,
       onViewportCreate,
-      renderNodeLimitExceeded,
       collapsedPaths: controlledCollapsedPaths,
       onToggleCollapse: controlledOnToggle,
       onCollapseChange,
@@ -145,8 +132,6 @@ export const JSONCrack = forwardRef<JSONCrackRef, JSONCrackProps>(
     const [edges, setEdges] = useState<GraphData["edges"]>([]);
     const [loading, setLoading] = useState(true);
     const [initialFitDone, setInitialFitDone] = useState(false);
-    const [aboveSupportedLimit, setAboveSupportedLimit] = useState(false);
-    const [totalNodes, setTotalNodes] = useState(0);
     const [paneWidth, setPaneWidth] = useState(2000);
     const [paneHeight, setPaneHeight] = useState(2000);
     const layoutSizeRef = useRef<{ width: number; height: number } | null>(null);
@@ -175,7 +160,7 @@ export const JSONCrack = forwardRef<JSONCrackRef, JSONCrackProps>(
     useEffect(() => {
       setLoading(true);
       setInitialFitDone(false);
-      const result = parseJsonGraph(jsonText, maxRenderableNodes);
+      const result = parseJsonGraph(jsonText);
 
       if (result.kind === "error") {
         setNodes([]);
@@ -185,28 +170,17 @@ export const JSONCrack = forwardRef<JSONCrackRef, JSONCrackProps>(
         return;
       }
 
-      if (result.kind === "above-limit") {
-        setTotalNodes(result.total);
-        setAboveSupportedLimit(true);
-        setNodes([]);
-        setEdges([]);
-        setLoading(false);
-        return;
-      }
-
       const { graph, syntaxErrorCount } = result;
       if (syntaxErrorCount > 0) {
         callbacksRef.current.onParseError?.(
           new Error(`Failed to parse data (${syntaxErrorCount} syntax error(s)).`)
         );
       }
-      setTotalNodes(graph.nodes.length);
-      setAboveSupportedLimit(false);
       setNodes(graph.nodes);
       setEdges(graph.edges);
       callbacksRef.current.onParse?.({ nodes: graph.nodes, edges: graph.edges });
       if (graph.nodes.length === 0) setLoading(false);
-    }, [jsonText, maxRenderableNodes]);
+    }, [jsonText]);
 
     // Keep the viewport in sync with container resizes — react-zoomable-ui snapshots dimensions at creation and does not re-measure on its own.
     useEffect(() => {
@@ -395,7 +369,7 @@ export const JSONCrack = forwardRef<JSONCrackRef, JSONCrackProps>(
         },
         expandAll: () => {
           if (isControlled) return;
-          const result = parseJsonGraph(jsonText, Number.MAX_SAFE_INTEGER);
+          const result = parseJsonGraph(jsonText);
           if (result.kind === "ok") {
             setInternalCollapsedPaths(result.defaultCollapsedPaths);
             onCollapseChangeRef.current?.(result.defaultCollapsedPaths);
@@ -561,8 +535,6 @@ export const JSONCrack = forwardRef<JSONCrackRef, JSONCrackProps>(
       onFinish: () => setCanvasDragging(containerRef.current, false),
     });
 
-    const tooLargeContent = renderNodeLimitExceeded?.(totalNodes, maxRenderableNodes);
-
     return (
       <div
         ref={containerRef}
@@ -581,15 +553,6 @@ export const JSONCrack = forwardRef<JSONCrackRef, JSONCrackProps>(
             onZoomIn={viewPortApi.zoomIn}
           />
         )}
-
-        {aboveSupportedLimit &&
-          (tooLargeContent ? (
-            tooLargeContent
-          ) : (
-            <div className={styles.tooLarge}>
-              {`This graph has ${totalNodes} nodes and exceeds the maxRenderableNodes limit (${maxRenderableNodes}).`}
-            </div>
-          ))}
 
         {loading && (
           <div className={styles.overlay}>
