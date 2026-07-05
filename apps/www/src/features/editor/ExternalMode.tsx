@@ -27,26 +27,7 @@ const ExternalMode = () => {
       <FocusTrap.InitialFocus />
       <Group>
         <Accordion variant="separated" w="100%">
-          <Accordion.Item value="1">
-            <Accordion.Control>How can I change the file size limit?</Accordion.Control>
-            <Accordion.Panel>
-              The main reason for the file size limit is to prevent performance issues, not to push
-              you to upgrade. You can increase the limit by setting{" "}
-              <Code>NEXT_PUBLIC_NODE_LIMIT</Code> in your <Code>.env</Code> file.
-              <br />
-              <br />
-              If you&apos;d like to work with even larger files and unlock additional features, you
-              can upgrade to the{" "}
-              <Anchor
-                href="https://todiagram.com?utm_source=jsoncrack&utm_medium=external-mode"
-                rel="noopener"
-                target="_blank"
-              >
-                Pro
-              </Anchor>{" "}
-              version.
-            </Accordion.Panel>
-          </Accordion.Item>
+
           <Accordion.Item value="2">
             <Accordion.Control>How can I stop this dialog from appearing?</Accordion.Control>
             <Accordion.Panel>

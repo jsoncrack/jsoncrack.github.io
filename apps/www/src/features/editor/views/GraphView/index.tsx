@@ -3,11 +3,9 @@ import { Box } from "@mantine/core";
 import styled from "styled-components";
 import { JSONCrack } from "jsoncrack-react";
 import type { JSONCrackRef, NodeData } from "jsoncrack-react";
-import { SUPPORTED_LIMIT } from "../../../../constants/graph";
 import useConfig from "../../../../store/useConfig";
 import useJson from "../../../../store/useJson";
 import { useModal } from "../../../../store/useModal";
-import { NotSupported } from "./NotSupported";
 import { SecureInfo } from "./SecureInfo";
 import { Toolbar } from "./Toolbar";
 import useGraph from "./stores/useGraph";
@@ -83,7 +81,6 @@ export const GraphView = ({ isWidget = false }: GraphProps) => {
     [setSelectedNode, setVisible]
   );
 
-  const maxVisibleNodes = Number.isFinite(SUPPORTED_LIMIT) ? SUPPORTED_LIMIT : 1500;
 
   return (
     <Box pos="relative" h="100%" w="100%">
@@ -103,12 +100,10 @@ export const GraphView = ({ isWidget = false }: GraphProps) => {
           showControls={false}
           showGrid={rulersEnabled}
           trackpadZoom={gesturesEnabled}
-          maxRenderableNodes={maxVisibleNodes}
           centerOnLayout
           onViewportCreate={setViewPort}
           onNodeClick={handleNodeClick}
           onCollapseChange={handleCollapseChange}
-          renderNodeLimitExceeded={() => <NotSupported />}
         />
       </StyledEditorWrapper>
     </Box>
