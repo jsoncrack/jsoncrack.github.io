@@ -127,6 +127,7 @@ export const JSONCrack = forwardRef<JSONCrackRef, JSONCrackProps>(
     ref
   ) => {
     const containerRef = useRef<HTMLDivElement | null>(null);
+    const initialParseDoneRef = useRef(false);
     const [viewPort, setViewPort] = useState<ViewPort | null>(null);
     const [nodes, setNodes] = useState<GraphData["nodes"]>([]);
     const [edges, setEdges] = useState<GraphData["edges"]>([]);
@@ -170,7 +171,7 @@ export const JSONCrack = forwardRef<JSONCrackRef, JSONCrackProps>(
         return;
       }
 
-      const { graph, syntaxErrorCount } = result;
+      const { graph, syntaxErrorCount, defaultCollapsedPaths } = result;
       if (syntaxErrorCount > 0) {
         callbacksRef.current.onParseError?.(
           new Error(`Failed to parse data (${syntaxErrorCount} syntax error(s)).`)
@@ -178,6 +179,11 @@ export const JSONCrack = forwardRef<JSONCrackRef, JSONCrackProps>(
       }
       setNodes(graph.nodes);
       setEdges(graph.edges);
+
+      if (!initialParseDoneRef.current && !isControlled) {
+        setInternalCollapsedPaths(defaultCollapsedPaths);
+        initialParseDoneRef.current = true;
+      }
       callbacksRef.current.onParse?.({ nodes: graph.nodes, edges: graph.edges });
       if (graph.nodes.length === 0) setLoading(false);
     }, [jsonText]);
@@ -369,11 +375,8 @@ export const JSONCrack = forwardRef<JSONCrackRef, JSONCrackProps>(
         },
         expandAll: () => {
           if (isControlled) return;
-          const result = parseJsonGraph(jsonText);
-          if (result.kind === "ok") {
-            setInternalCollapsedPaths(result.defaultCollapsedPaths);
-            onCollapseChangeRef.current?.(result.defaultCollapsedPaths);
-          }
+          setInternalCollapsedPaths([]);
+          onCollapseChangeRef.current?.([]);
         },
         getCollapsedPaths: () => collapsedPathsRef.current ?? [],
       }),

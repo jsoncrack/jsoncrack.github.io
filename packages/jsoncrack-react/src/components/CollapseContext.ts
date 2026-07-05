@@ -15,9 +15,7 @@ export const useCollapseContext = (): CollapseContextValue => useContext(Collaps
 export const pathKey = (path: JSONPath): string => JSON.stringify(path);
 
 export const isPathCollapsed = (collapsedSet: Set<string>, path: JSONPath): boolean => {
-  const isDeep = path.length >= 2;
-  const isToggled = collapsedSet.has(pathKey(path));
-  return isDeep ? !isToggled : isToggled;
+  return collapsedSet.has(pathKey(path));
 };
 
 export const isNodeHidden = (
@@ -28,7 +26,6 @@ export const isNodeHidden = (
   
   for (let len = 1; len < nodePath.length; len++) {
     const isDeep = len >= 2;
-    let isToggled = false;
     for (const prefix of collapsedPrefixes) {
       if (prefix.length === len) {
         let matches = true;
@@ -39,13 +36,10 @@ export const isNodeHidden = (
           }
         }
         if (matches) {
-          isToggled = true;
-          break;
+          return true;
         }
       }
     }
-    const isCollapsed = isDeep ? !isToggled : isToggled;
-    if (isCollapsed) return true;
   }
   return false;
 };
