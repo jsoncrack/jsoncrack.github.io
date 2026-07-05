@@ -41,7 +41,7 @@ describe("toJsonText", () => {
 
 describe("parseJsonGraph", () => {
   it("returns kind: 'ok' with graph and zero syntax errors for valid JSON", () => {
-    const result = parseJsonGraph('{"a":1}', 1500);
+    const result = parseJsonGraph('{"a":1}');
     expect(result.kind).toBe("ok");
     if (result.kind !== "ok") return;
     expect(result.syntaxErrorCount).toBe(0);
@@ -49,19 +49,13 @@ describe("parseJsonGraph", () => {
   });
 
   it("returns kind: 'ok' with a non-zero syntaxErrorCount for partially-broken JSON", () => {
-    const result = parseJsonGraph('{"broken": }', 1500);
+    const result = parseJsonGraph('{"broken": }');
     expect(result.kind).toBe("ok");
     if (result.kind !== "ok") return;
     expect(result.syntaxErrorCount).toBeGreaterThan(0);
   });
 
-  it("returns kind: 'above-limit' with total count when over the node cap", () => {
-    const big = { items: Array.from({ length: 10 }, (_, i) => ({ id: i })) };
-    const result = parseJsonGraph(JSON.stringify(big), 3);
-    expect(result.kind).toBe("above-limit");
-    if (result.kind !== "above-limit") return;
-    expect(result.total).toBeGreaterThan(3);
-  });
+
 
   // NOTE: the `kind: "error"` branch is only reached on unexpected internal
   // exceptions in `parseGraph` — jsonc-parser is error-tolerant, so there is

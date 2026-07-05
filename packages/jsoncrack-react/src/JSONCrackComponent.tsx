@@ -80,6 +80,8 @@ export interface JSONCrackProps {
   showGrid?: boolean;
   /** Treat two-finger trackpad gestures as touch (pinch-zoom, etc). Defaults to `false`. */
   trackpadZoom?: boolean;
+  /** Auto fit-to-center after each ELK layout pass. Defaults to `true`. */
+  centerOnLayout?: boolean;
   /** Additional class name appended to the canvas wrapper. */
   className?: string;
   /** Additional inline style merged onto the canvas wrapper. */
@@ -117,6 +119,11 @@ export const JSONCrack = forwardRef<JSONCrackRef, JSONCrackProps>(
       showControls = true,
       showGrid = true,
       trackpadZoom = false,
+      centerOnLayout = true,
+      className,
+      style,
+      onNodeClick,
+      onParse,
       onParseError,
       onViewportCreate,
       collapsedPaths: controlledCollapsedPaths,

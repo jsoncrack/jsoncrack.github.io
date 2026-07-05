@@ -1,5 +1,6 @@
 import React from "react";
 import type { NodeData } from "../types";
+import type { JSONPath } from "jsonc-parser";
 import styles from "./Node.module.css";
 import { TextRenderer } from "./TextRenderer";
 import { getTextColor } from "./nodeStyles";
