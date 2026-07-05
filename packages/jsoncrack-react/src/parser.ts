@@ -224,6 +224,6 @@ export const parseGraph = (json: string): ParseGraphResult => {
     nodes,
     edges,
     errors: parseErrors,
-    defaultCollapsedPaths,
+    defaultCollapsedPaths: nodes.length > 1000 ? defaultCollapsedPaths : [],
   };
 };
