@@ -10,6 +10,7 @@ type ObjectNodeProps = {
   node: NodeData;
   x: number;
   y: number;
+  onNodeValueChange?: (path: JSONPath, newValue: any) => void;
 };
 
 type RowProps = {
@@ -18,11 +19,12 @@ type RowProps = {
   y: number;
   index: number;
   parentPath: JSONPath;
+  onNodeValueChange?: (path: JSONPath, newValue: any) => void;
 };
 
 const ROW_HEIGHT = 30;
 
-const Row = ({ row, x, y, index, parentPath }: RowProps) => {
+const Row = ({ row, x, y, index, parentPath, onNodeValueChange }: RowProps) => {
   const rowPosition = index * ROW_HEIGHT;
   const { collapsedSet, onToggleCollapse } = useCollapseContext();
 
@@ -44,6 +46,30 @@ const Row = ({ row, x, y, index, parentPath }: RowProps) => {
       return collapsed ? `⋯ ${count} items` : `[${count} items]`;
     }
     return row.value;
+  };
+
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editValue, setEditValue] = React.useState(String(row.value));
+
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditing(true);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      setIsEditing(false);
+      let newValue: any = editValue;
+      if (row.type === "number") newValue = Number(editValue);
+      else if (row.type === "boolean") newValue = editValue === "true";
+      else if (row.type === "null") newValue = null;
+
+      const path = row.key != null ? [...parentPath, row.key] : parentPath;
+      onNodeValueChange?.(path, newValue);
+    } else if (e.key === "Escape") {
+      setIsEditing(false);
+      setEditValue(String(row.value));
+    }
   };
 
   const handleToggle = (event: React.MouseEvent) => {
@@ -84,12 +110,26 @@ const Row = ({ row, x, y, index, parentPath }: RowProps) => {
       >
         {row.key}:{" "}
       </span>
-      <TextRenderer>{getRowText()}</TextRenderer>
+      {isEditing ? (
+        <input
+          autoFocus
+          value={editValue}
+          onChange={e => setEditValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={() => setIsEditing(false)}
+          onClick={e => e.stopPropagation()}
+          style={{ background: "transparent", color: "inherit", border: "1px solid gray", outline: "none", width: "100%", maxWidth: "150px" }}
+        />
+      ) : (
+        <span onDoubleClick={isContainer ? undefined : handleDoubleClick}>
+          <TextRenderer>{getRowText()}</TextRenderer>
+        </span>
+      )}
     </span>
   );
 };
 
-const ObjectNodeBase = ({ node, x, y }: ObjectNodeProps) => {
+const ObjectNodeBase = ({ node, x, y, onNodeValueChange }: ObjectNodeProps) => {
   const parentPath = node.path ?? [];
   return (
     <foreignObject
@@ -108,6 +148,7 @@ const ObjectNodeBase = ({ node, x, y }: ObjectNodeProps) => {
           y={y}
           index={index}
           parentPath={parentPath}
+          onNodeValueChange={onNodeValueChange}
         />
       ))}
     </foreignObject>

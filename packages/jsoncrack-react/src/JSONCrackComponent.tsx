@@ -109,6 +109,8 @@ export interface JSONCrackProps {
   onToggleCollapse?: (path: JSONPath) => void;
   /** Observe the internal collapsed-paths set (uncontrolled mode). */
   onCollapseChange?: (collapsedPaths: string[]) => void;
+  /** Called when a node's value is edited via double click. */
+  onNodeValueChange?: (path: JSONPath, newValue: any) => void;
 }
 
 /** Interactive JSON-to-graph visualization. Forwards a `JSONCrackRef` for imperative viewport control. */
@@ -133,6 +135,7 @@ export const JSONCrack = forwardRef<JSONCrackRef, JSONCrackProps>(
       collapsedPaths: controlledCollapsedPaths,
       onToggleCollapse: controlledOnToggle,
       onCollapseChange,
+      onNodeValueChange,
     },
     ref
   ) => {
@@ -538,8 +541,8 @@ export const JSONCrack = forwardRef<JSONCrackRef, JSONCrackProps>(
 
     // Stable render factories so reaflow doesn't re-key nodes/edges on every parent render.
     const renderNode = useCallback(
-      (nodeProps: NodeProps) => <CustomNode {...nodeProps} onNodeClick={onNodeClick} />,
-      [onNodeClick]
+      (nodeProps: NodeProps) => <CustomNode {...nodeProps} onNodeClick={onNodeClick} onNodeValueChange={onNodeValueChange} />,
+      [onNodeClick, onNodeValueChange]
     );
     const renderEdge = useCallback(
       (edgeProps: EdgeProps) => (

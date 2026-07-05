@@ -7,9 +7,10 @@ import { TextNode } from "./TextNode";
 
 type CustomNodeProps = NodeProps<NodeData> & {
   onNodeClick?: (node: NodeData) => void;
+  onNodeValueChange?: (path: any[], newValue: any) => void;
 };
 
-const CustomNodeBase = ({ onNodeClick, ...nodeProps }: CustomNodeProps) => {
+const CustomNodeBase = ({ onNodeClick, onNodeValueChange, ...nodeProps }: CustomNodeProps) => {
   const handleNodeClick = React.useCallback(
     (_: React.MouseEvent<SVGGElement, MouseEvent>, data: NodeData) => {
       onNodeClick?.(data);
@@ -37,10 +38,10 @@ const CustomNodeBase = ({ onNodeClick, ...nodeProps }: CustomNodeProps) => {
     >
       {({ node, x, y }) => {
         if (nodeProps.properties.text[0]?.key == null) {
-          return <TextNode node={nodeProps.properties as NodeData} x={x} y={y} />;
+          return <TextNode node={nodeProps.properties as NodeData} x={x} y={y} onNodeValueChange={onNodeValueChange} />;
         }
 
-        return <ObjectNode node={node as NodeData} x={x} y={y} />;
+        return <ObjectNode node={node as NodeData} x={x} y={y} onNodeValueChange={onNodeValueChange} />;
       }}
     </Node>
   );

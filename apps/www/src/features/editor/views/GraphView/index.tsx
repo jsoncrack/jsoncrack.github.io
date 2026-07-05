@@ -55,6 +55,7 @@ export const GraphView = ({ isWidget = false }: GraphProps) => {
   const rulersEnabled = useConfig(state => state.rulersEnabled);
   const darkmodeEnabled = useConfig(state => state.darkmodeEnabled);
   const json = useJson(state => state.json);
+  const updateNodeValue = useJson(state => state.updateNodeValue);
   const setVisible = useModal(state => state.setVisible);
   const jsonCrackRef = React.useRef<JSONCrackRef>(null);
 
@@ -104,6 +105,7 @@ export const GraphView = ({ isWidget = false }: GraphProps) => {
           onViewportCreate={setViewPort}
           onNodeClick={handleNodeClick}
           onCollapseChange={handleCollapseChange}
+          onNodeValueChange={updateNodeValue}
         />
       </StyledEditorWrapper>
     </Box>
